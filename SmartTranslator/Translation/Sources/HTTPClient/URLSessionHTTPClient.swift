@@ -26,7 +26,10 @@ public final class URLSessionHTTPClient: HTTPClient {
     }
     
     public func post(_ path: String, body: Data, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
-        let task = session.dataTask(with: buildRequest(path: path)) { data, response, error in
+        var request = buildRequest(path: path)
+        request.httpBody = body
+        
+        let task = session.dataTask(with: request) { data, response, error in
             completion(Result {
                 if let error = error {
                     throw error

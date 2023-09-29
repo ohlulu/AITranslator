@@ -2,8 +2,8 @@
 //  Copyright © 2023 Ohlulu. All rights reserved.
 //
 
-import XCTest
 import Translation
+import XCTest
 
 final class URLSessionHTTPClientTests: XCTestCase {
     
@@ -21,7 +21,10 @@ final class URLSessionHTTPClientTests: XCTestCase {
         URLProtocolStub.observeRequests { request in
             XCTAssertEqual(request.url, url.appending(path: anyPath()))
             XCTAssertEqual(request.httpMethod, "POST")
-            XCTAssertEqual(request.allHTTPHeaderFields, headers)
+            anyHeaders().forEach { key, value in
+                XCTAssertEqual(request.allHTTPHeaderFields?[key], value)
+            }
+            XCTAssertEqual(request.body, anyData())
             exp.fulfill()
         }
         
@@ -98,11 +101,11 @@ final class URLSessionHTTPClientTests: XCTestCase {
         let result = resultFor(values, file: file, line: line)
         
         switch result {
-            case let .success(values):
-                return values
-            default:
-                XCTFail("Expected success, got \(result) instead", file: file, line: line)
-                return nil
+        case let .success(values):
+            return values
+        default:
+            XCTFail("Expected success, got \(result) instead", file: file, line: line)
+            return nil
         }
     }
     
@@ -110,15 +113,15 @@ final class URLSessionHTTPClientTests: XCTestCase {
         let result = resultFor(values, taskHandler: taskHandler, file: file, line: line)
         
         switch result {
-            case let .failure(error):
-                return error
-            default:
-                XCTFail("Expected failure, got \(result) instead", file: file, line: line)
-                return nil
+        case let .failure(error):
+            return error
+        default:
+            XCTFail("Expected failure, got \(result) instead", file: file, line: line)
+            return nil
         }
     }
     
-    private func resultFor(_ values: (data: Data?, response: URLResponse?, error: Error?)?, taskHandler: (HTTPClientTask) -> Void = { _ in },  file: StaticString = #filePath, line: UInt = #line) -> HTTPClient.Result {
+    private func resultFor(_ values: (data: Data?, response: URLResponse?, error: Error?)?, taskHandler: (HTTPClientTask) -> Void = { _ in }, file: StaticString = #filePath, line: UInt = #line) -> HTTPClient.Result {
         values.map { URLProtocolStub.stub(data: $0, response: $1, error: $2) }
         
         let sut = makeSUT(file: file, line: line)
@@ -141,6 +144,29 @@ final class URLSessionHTTPClientTests: XCTestCase {
     private func nonHTTPURLResponse() -> URLResponse {
         return URLResponse(url: anyURL(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
     }
-    
 }
 
+private extension URLRequest {
+    var body: Data? {
+        guard let stream = httpBodyStream else { return nil }
+        var data = Data()
+        let bufferSize = 1024 * 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+            
+        stream.open()
+            
+        while stream.hasBytesAvailable {
+            let bytesRead = stream.read(buffer, maxLength: bufferSize)
+            if bytesRead > 0 {
+                data.append(buffer, count: bytesRead)
+            } else {
+                break
+            }
+        }
+            
+        buffer.deallocate()
+        stream.close()
+            
+        return data
+    }
+}
