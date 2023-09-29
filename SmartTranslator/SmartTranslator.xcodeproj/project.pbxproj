@@ -20,6 +20,7 @@
 		5050A9862AC6A163006C5585 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5050A9892AC6A163006C5585 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5050A98B2AC6A163006C5585 /* SmartTranslator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SmartTranslator.entitlements; sourceTree = "<group>"; };
+		5050A9912AC6A24B006C5585 /* Translation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Translation; path = ../../Translation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +53,7 @@
 		5050A9812AC6A162006C5585 /* SmartTranslator */ = {
 			isa = PBXGroup;
 			children = (
+				5050A9912AC6A24B006C5585 /* Translation */,
 				5050A9822AC6A162006C5585 /* AppDelegate.swift */,
 				5050A9842AC6A162006C5585 /* ViewController.swift */,
 				5050A9862AC6A163006C5585 /* Assets.xcassets */,
